@@ -2,10 +2,34 @@
 
 Exception OS is a demo-ready operating system for teams that need fewer dashboards and faster decisions. It ingests operational signals, detects exceptions that require human judgment, generates structured decision briefs, and routes them into a Notion-centered workflow.
 
+[Live Demo](https://exception-os.vercel.app) · [GitHub Repository](https://github.com/aniruddhaadak80/exception-os) · [DEV Submission Draft](./docs/devto-submission.md)
+
+## Status
+
+Exception OS is complete as a deployable challenge app.
+
+- Production deployment is live on Vercel.
+- The dashboard is responsive and verified on desktop and mobile layouts.
+- Lint, tests, and production build are passing.
+- Real Notion MCP OAuth, workspace sync, and Notion publishing are implemented server-side.
+
+The only runtime step that still depends on the user is approving Notion OAuth for a specific workspace, which cannot be done automatically on someone else’s behalf.
+
+## Screenshots
+
+### Desktop
+
+![Exception OS desktop dashboard](./docs/assets/exception-os-dashboard-desktop.png)
+
+### Mobile
+
+![Exception OS mobile dashboard](./docs/assets/exception-os-dashboard-mobile.png)
+
 This repository contains:
 
 - A polished Next.js demo app for the Exception OS dashboard
 - A local simulation engine for signals, exceptions, and decisions
+- A real server-side Notion MCP integration for OAuth, workspace search, and publishing
 - Product documentation for the feature spec and architecture
 - A challenge-ready narrative aligned with the Notion MCP judging criteria
 
@@ -44,6 +68,10 @@ Once configured, use the dashboard's `Connect Notion MCP` action to complete OAu
 3. Trigger a new simulated incident from the dashboard.
 4. Connect Notion MCP and publish the selected decision brief into your workspace.
 5. Sync related workspace context back into the dashboard.
+
+## Challenge submission
+
+The prepared DEV submission is in [./docs/devto-submission.md](./docs/devto-submission.md). It already includes the real screenshots, live demo URL, and GitHub repo link.
 
 ## Project structure
 

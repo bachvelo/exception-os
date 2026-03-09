@@ -311,6 +311,10 @@ select {
   line-height: 1.6;
 }
 
+.feedback-success {
+  color: #15584c;
+}
+
 .feedback-error {
   color: #8b2e20;
 }

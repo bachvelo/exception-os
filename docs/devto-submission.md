@@ -6,6 +6,10 @@ tags: devchallenge, notionchallenge, mcp, ai
 
 *This is a submission for the [Notion MCP Challenge](https://dev.to/challenges/notion-2026-03-04)*
 
+**Live demo:** https://exception-os.vercel.app
+
+**GitHub repository:** https://github.com/aniruddhaadak80/exception-os
+
 ## What I Built
 
 I built **Exception OS**, an exception-first operating system for teams drowning in operational noise.
@@ -22,9 +26,21 @@ The application includes:
 
 In short, Exception OS treats Notion as the operational memory and approval layer for critical decisions.
 
+## Screenshots
+
+### Desktop dashboard
+
+![Exception OS desktop dashboard](https://raw.githubusercontent.com/aniruddhaadak80/exception-os/main/docs/assets/exception-os-dashboard-desktop.png)
+
+### Mobile dashboard
+
+![Exception OS mobile dashboard](https://raw.githubusercontent.com/aniruddhaadak80/exception-os/main/docs/assets/exception-os-dashboard-mobile.png)
+
 ## Video Demo
 
-<!-- Add your demo video link here -->
+I am using production screenshots in this submission and the live deployed app for verification.
+
+Live demo: https://exception-os.vercel.app
 
 ## How I Used Notion MCP
 

@@ -23,7 +23,15 @@ async function getJson<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new Error("Unable to load dashboard data.");
+    const text = await response.text();
+
+    try {
+      const payload = JSON.parse(text) as { error?: string };
+
+      throw new Error(payload.error ?? "Unable to load dashboard data.");
+    } catch {
+      throw new Error(text || "Unable to load dashboard data.");
+    }
   }
 
   return response.json() as Promise<T>;
@@ -42,9 +50,15 @@ export function ExceptionOsApp() {
   const [workspaceContext, setWorkspaceContext] = useState<string>("");
   const [publishResult, setPublishResult] = useState<NotionActionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [callbackSuccess, setCallbackSuccess] = useState<string | null>(null);
+  const [callbackError, setCallbackError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
+
+    const params = new URLSearchParams(window.location.search);
+    setCallbackSuccess(params.get("notion") === "connected" ? "Notion MCP connected successfully." : null);
+    setCallbackError(params.get("notion_error"));
 
     Promise.all([getJson<DashboardSnapshot>("/api/dashboard"), getJson<NotionStatus>("/api/notion/status")])
       .then(([data, notion]) => {
@@ -217,6 +231,8 @@ export function ExceptionOsApp() {
         </div>
         {(workspaceContext || publishResult || notionStatus?.error || notionStatus?.configurationMessage) && (
           <div className="notion-feedback-grid">
+            {callbackSuccess ? <div className="feedback-card feedback-success">{callbackSuccess}</div> : null}
+            {callbackError ? <div className="feedback-card feedback-error">{callbackError}</div> : null}
             {workspaceContext ? <pre className="workspace-context">{workspaceContext}</pre> : null}
             {publishResult ? <div className="feedback-card">{publishResult.summary}</div> : null}
             {!publishResult && notionStatus?.configurationMessage ? <div className="feedback-card">{notionStatus.configurationMessage}</div> : null}

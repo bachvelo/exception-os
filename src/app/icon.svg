@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Exception OS icon">
+  <defs>
+    <linearGradient id="exceptionGradient" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#1f2630" />
+      <stop offset="100%" stop-color="#d7674f" />
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="16" fill="#f4efe6" />
+  <path d="M18 46 L28 18 H36 L46 46 H39.5 L37 39 H27 L24.5 46 Z M29.5 33 H34.5 L32 25.5 Z" fill="url(#exceptionGradient)" />
+</svg>
