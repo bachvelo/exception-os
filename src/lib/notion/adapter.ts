@@ -12,6 +12,7 @@ import {
   registerClient,
 } from "@/lib/notion/oauth";
 import { callTool, createNotionClient, listToolNames, pickToolName } from "@/lib/notion/mcp-client";
+import { getConfiguredPublishTarget, parseNotionPublishTarget, toNotionParent } from "@/lib/notion/publish-target";
 import {
   hasSessionSecret,
   NOTION_FLOW_COOKIE,
@@ -26,21 +27,6 @@ const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
 const FLOW_MAX_AGE = 60 * 10;
 
 const getServerUrl = () => process.env.NOTION_MCP_SERVER_URL ?? "https://mcp.notion.com";
-
-const getPublishParent = () => {
-  const databaseId = process.env.NOTION_PARENT_DATABASE_ID;
-  const pageId = process.env.NOTION_PARENT_PAGE_ID;
-
-  if (databaseId) {
-    return { database_id: databaseId };
-  }
-
-  if (pageId) {
-    return { page_id: pageId };
-  }
-
-  return { type: "workspace" };
-};
 
 const getCookieStore = async () => cookies();
 
@@ -74,6 +60,8 @@ const readSession = async () => {
 const writeSession = async (session: NotionSession) => {
   await saveCookie(NOTION_SESSION_COOKIE, seal(session), SESSION_MAX_AGE);
 };
+
+const resolvePublishTarget = (session?: NotionSession | null) => getConfiguredPublishTarget() ?? session?.publishTarget ?? null;
 
 const readFlowState = async () => {
   const cookieStore = await getCookieStore();
@@ -191,7 +179,7 @@ async function getAuthenticatedClient() {
 const extractFirstUrl = (text: string) => text.match(/https?:\/\/\S+/)?.[0];
 
 export async function getNotionStatus(): Promise<NotionStatus> {
-  const parent = getPublishParent();
+  const configuredTarget = getConfiguredPublishTarget();
 
   if (!hasSessionSecret()) {
     return {
@@ -210,12 +198,14 @@ export async function getNotionStatus(): Promise<NotionStatus> {
     return {
       connected: false,
       ready: false,
-      canPublish: Boolean(parent),
+      canPublish: false,
       serverUrl: getServerUrl(),
       availableTools: [],
       configurationMessage: "Connect Notion MCP to enable live workspace search and publishing.",
     };
   }
+
+  const publishTarget = resolvePublishTarget(session) ?? configuredTarget;
 
   try {
     const { client, tools } = await getAuthenticatedClient();
@@ -230,11 +220,13 @@ export async function getNotionStatus(): Promise<NotionStatus> {
     return {
       connected: true,
       ready: true,
-      canPublish: Boolean(parent),
+      canPublish: Boolean(publishTarget),
       serverUrl: getServerUrl(),
       availableTools: tools,
       accountLabel,
-      configurationMessage: undefined,
+      configurationMessage: publishTarget ? undefined : "Add a Notion page URL or page ID before publishing a decision brief.",
+      publishTargetLabel: publishTarget?.label,
+      publishTargetType: publishTarget?.type,
     };
   } catch (error) {
     if (error instanceof Error && error.message === "REAUTH_REQUIRED") {
@@ -243,7 +235,7 @@ export async function getNotionStatus(): Promise<NotionStatus> {
       return {
         connected: false,
         ready: false,
-        canPublish: Boolean(parent),
+        canPublish: false,
         serverUrl: getServerUrl(),
         availableTools: [],
         error: "Your Notion session expired and needs to be reconnected.",
@@ -253,12 +245,31 @@ export async function getNotionStatus(): Promise<NotionStatus> {
     return {
       connected: true,
       ready: false,
-      canPublish: Boolean(parent),
+      canPublish: Boolean(publishTarget),
       serverUrl: getServerUrl(),
       availableTools: [],
+      publishTargetLabel: publishTarget?.label,
+      publishTargetType: publishTarget?.type,
       error: error instanceof Error ? error.message : "Unable to connect to Notion MCP.",
     };
   }
+}
+
+export async function savePublishTarget(input: string) {
+  const session = await readSession();
+
+  if (!session) {
+    throw new Error("Connect Notion MCP before setting a publish target.");
+  }
+
+  const publishTarget = parseNotionPublishTarget(input);
+
+  await writeSession({
+    ...session,
+    publishTarget,
+  });
+
+  return publishTarget;
 }
 
 export async function syncWorkspaceContext(query: string) {
@@ -355,11 +366,14 @@ export async function publishDecisionToNotion(payload: {
   exceptionRecord: ExceptionRecord;
   decision: DecisionBrief;
 }): Promise<NotionActionResult> {
-  const parent = getPublishParent();
+  const session = await readSession();
+  const publishTarget = resolvePublishTarget(session);
 
-  if (!parent) {
-    throw new Error("Set NOTION_PARENT_PAGE_ID or NOTION_PARENT_DATABASE_ID before publishing to Notion.");
+  if (!publishTarget) {
+    throw new Error("Add a Notion page URL or page ID before publishing to Notion.");
   }
+
+  const parent = toNotionParent(publishTarget);
 
   const { client, tools } = await getAuthenticatedClient();
   const createPagesTool = pickToolName(tools, ["notion-create-pages"]);

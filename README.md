@@ -70,12 +70,12 @@ To enable it locally or on Vercel, configure:
 Optional:
 
 - `NOTION_MCP_SERVER_URL`: defaults to `https://mcp.notion.com`
-- `NOTION_PARENT_PAGE_ID` or `NOTION_PARENT_DATABASE_ID`: custom Notion location for published decision briefs. If omitted, Exception OS publishes to the workspace root when supported by the connected workspace.
+- `NOTION_PARENT_PAGE_ID`, `NOTION_PARENT_DATABASE_ID`, or `NOTION_PARENT_DATA_SOURCE_ID`: optional fixed Notion location for published decision briefs
 - `EXCEPTION_OS_GITHUB_REPO`: GitHub repository to ingest live signals from, in `owner/repo` format
 - `EXCEPTION_OS_GITHUB_TOKEN`: optional GitHub token for higher rate limits
 - `NOTION_SUPPORT_QUERY`, `NOTION_REVENUE_QUERY`, `NOTION_CALENDAR_QUERY`, `NOTION_DOCS_QUERY`: optional workspace-specific search prompts for live Notion signal ingestion
 
-Once configured, use the dashboard's `Connect Notion MCP` action to complete OAuth.
+Once configured, use the dashboard's `Connect Notion MCP` action to complete OAuth. If you do not set a fixed parent in environment variables, paste a Notion page URL into the dashboard and save it before publishing.
 
 ## Demo flow
 

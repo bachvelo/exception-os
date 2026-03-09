@@ -6,6 +6,11 @@ export type NotionSession = {
   expiresAt?: number;
   clientId: string;
   clientSecret?: string;
+  publishTarget?: {
+    type: "page_id" | "database_id" | "data_source_id";
+    id: string;
+    label?: string;
+  };
 };
 
 export type NotionAuthFlowState = {

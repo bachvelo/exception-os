@@ -164,6 +164,20 @@ select {
   color: var(--muted);
 }
 
+.notion-target-input {
+  min-width: min(100%, 22rem);
+  flex: 1 1 18rem;
+  border: 1px solid rgba(31, 38, 48, 0.14);
+  background: rgba(255, 252, 247, 0.88);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 13px 18px;
+}
+
+.notion-target-input::placeholder {
+  color: rgba(31, 38, 48, 0.55);
+}
+
 .metrics-grid,
 .content-grid,
 .lower-grid,

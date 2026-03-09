@@ -52,6 +52,7 @@ export function ExceptionOsApp() {
   const [error, setError] = useState<string | null>(null);
   const [callbackSuccess, setCallbackSuccess] = useState<string | null>(null);
   const [callbackError, setCallbackError] = useState<string | null>(null);
+  const [publishTargetInput, setPublishTargetInput] = useState("");
 
   useEffect(() => {
     let isMounted = true;
@@ -69,6 +70,7 @@ export function ExceptionOsApp() {
         setSnapshot(data);
         setSelectedExceptionId(data.exceptions[0]?.id ?? null);
         setNotionStatus(notion);
+        setPublishTargetInput(notion.publishTargetLabel ?? "");
       })
       .catch((loadError: unknown) => {
         if (!isMounted) {
@@ -109,6 +111,7 @@ export function ExceptionOsApp() {
   const refreshNotionStatus = async () => {
     const status = await getJson<NotionStatus>("/api/notion/status");
     setNotionStatus(status);
+    setPublishTargetInput(status.publishTargetLabel ?? "");
   };
 
   const handleDisconnectNotion = async () => {
@@ -159,8 +162,28 @@ export function ExceptionOsApp() {
       });
       setPublishResult(response.result);
       setNotionStatus(response.status);
+      setPublishTargetInput(response.status.publishTargetLabel ?? publishTargetInput);
     } catch (publishError: unknown) {
       setError(publishError instanceof Error ? publishError.message : "Failed to publish decision.");
+    } finally {
+      setIsNotionBusy(false);
+    }
+  };
+
+  const handleSavePublishTarget = async () => {
+    setIsNotionBusy(true);
+    setPublishResult(null);
+
+    try {
+      const status = await getJson<NotionStatus>("/api/notion/target", {
+        method: "POST",
+        body: JSON.stringify({ value: publishTargetInput }),
+      });
+
+      setNotionStatus(status);
+      setPublishTargetInput(status.publishTargetLabel ?? publishTargetInput);
+    } catch (targetError: unknown) {
+      setError(targetError instanceof Error ? targetError.message : "Failed to save the Notion publish target.");
     } finally {
       setIsNotionBusy(false);
     }
@@ -213,6 +236,17 @@ export function ExceptionOsApp() {
           <div className="notion-actions">
             {notionStatus?.connected ? (
               <>
+                <input
+                  className="notion-target-input"
+                  type="text"
+                  value={publishTargetInput}
+                  onChange={(event) => setPublishTargetInput(event.target.value)}
+                  placeholder="Paste a Notion page URL or page ID"
+                  disabled={isNotionBusy}
+                />
+                <button className="secondary-button" onClick={handleSavePublishTarget} disabled={isNotionBusy || !publishTargetInput.trim()}>
+                  Save Publish Target
+                </button>
                 <button className="secondary-button" onClick={handleSyncWorkspace} disabled={isNotionBusy}>
                   {isNotionBusy ? "Working..." : "Sync Workspace Context"}
                 </button>

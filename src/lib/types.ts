@@ -69,6 +69,8 @@ export type NotionStatus = {
   lastSyncSummary?: string;
   error?: string;
   configurationMessage?: string;
+  publishTargetLabel?: string;
+  publishTargetType?: "page_id" | "database_id" | "data_source_id";
 };
 
 export type NotionActionResult = {
