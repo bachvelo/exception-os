@@ -190,9 +190,10 @@ export function ExceptionOsApp() {
         </div>
         <div className="hero-actions">
           <button className="primary-button" onClick={handleSimulate} disabled={isPending}>
-            {isPending ? "Simulating..." : "Simulate New Incident"}
+            {isPending ? "Refreshing..." : "Refresh Live Signals"}
           </button>
           <p className="hero-note">Latest snapshot: {new Date(snapshot.generatedAt).toLocaleTimeString()}</p>
+          <p className="hero-note">{snapshot.sourceSummary}</p>
         </div>
       </section>
 
@@ -256,12 +257,12 @@ export function ExceptionOsApp() {
         <article className="panel mode-card">
           <PanelHeader
             title="Ingestion Mode"
-            subtitle="Operational signals currently run in deterministic demo mode so the product can be judged reliably without depending on external APIs during the challenge."
+            subtitle="Operational signals now come from live public GitHub activity and, when connected, live Notion workspace context."
           />
           <ul className="architecture-list compact-list">
-            <li>Signals are simulated but structured like real GitHub, support, revenue, calendar, and docs events</li>
-            <li>Decision generation, exception routing, and Notion publishing are fully functional</li>
-            <li>The architecture keeps live source connectors as the next production step</li>
+            <li>GitHub signals are fetched live from the configured repository</li>
+            <li>Support, revenue, calendar, and docs signals can be inferred from live Notion workspace search results</li>
+            <li>Decision generation, exception routing, and Notion publishing are fully functional end to end</li>
           </ul>
         </article>
       </section>
@@ -269,8 +270,8 @@ export function ExceptionOsApp() {
       <section className="metrics-grid">
         <MetricCard label="Active exceptions" value={metricFormatter.format(snapshot.metrics.exceptionCount)} tone="sun" />
         <MetricCard label="Urgent now" value={metricFormatter.format(snapshot.metrics.urgentCount)} tone="rose" />
-        <MetricCard label="Approval rate" value={`${snapshot.metrics.approvalRate}%`} tone="teal" />
-        <MetricCard label="Avg. decision time" value={`${snapshot.metrics.averageDecisionMinutes} min`} tone="ink" />
+        <MetricCard label="Avg. confidence" value={`${snapshot.metrics.averageConfidence}%`} tone="teal" />
+        <MetricCard label="Avg. SLA" value={`${snapshot.metrics.averageSlaMinutes} min`} tone="ink" />
       </section>
 
       <section className="content-grid">
@@ -324,7 +325,7 @@ export function ExceptionOsApp() {
 
       <section className="lower-grid">
         <div className="panel signal-panel">
-          <PanelHeader title="Incoming signals" subtitle="Each signal is normalized into a consistent operating format before classification." />
+          <PanelHeader title="Incoming signals" subtitle="Each signal is pulled from a live source and normalized into a consistent operating format before classification." />
           <div className="signal-list">
             {snapshot.signals.map((signal) => (
               <article className="signal-row" key={signal.id}>
@@ -344,10 +345,10 @@ export function ExceptionOsApp() {
         </div>
 
         <div className="panel architecture-panel">
-          <PanelHeader title="Architecture at a glance" subtitle="This is a deployed SaaS-style app with real user-owned Notion workspaces and demo-mode upstream signals." />
+          <PanelHeader title="Architecture at a glance" subtitle="This is a deployed SaaS-style app with real user-owned Notion workspaces and live upstream signals." />
           <ul className="architecture-list">
             <li>Each user can connect a separate Notion workspace through OAuth.</li>
-            <li>Signal ingestion currently uses challenge-stable demo events shaped like GitHub, support, revenue, calendar, and docs signals.</li>
+            <li>Signal ingestion uses live GitHub repository activity plus live Notion workspace search context.</li>
             <li>A hybrid decision engine scores severity, business impact, and owner ambiguity.</li>
             <li>Decision briefs are published into Notion through a real MCP client and OAuth flow.</li>
             <li>Human approval closes the loop and feeds future routing quality.</li>

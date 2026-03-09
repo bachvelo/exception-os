@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { DecisionBrief, ExceptionRecord, NotionActionResult, NotionStatus, Signal } from "@/lib/types";
+import { createNotionSearchSignal } from "@/lib/live-sources";
 import {
   buildAuthorizationUrl,
   discoverOAuthMetadata,
@@ -271,6 +272,47 @@ export async function syncWorkspaceContext(query: string) {
   const result = await callTool(client, searchTool, { query });
 
   return result.text;
+}
+
+export async function fetchNotionSignals(): Promise<Signal[]> {
+  const session = await readSession();
+
+  if (!session) {
+    return [];
+  }
+
+  try {
+    const { client, tools } = await getAuthenticatedClient();
+    const searchTool = pickToolName(tools, ["notion-search", "search"]);
+
+    if (!searchTool) {
+      return [];
+    }
+
+    const queries = [
+      { source: "Support" as const, impactArea: "Customer" as const, query: process.env.NOTION_SUPPORT_QUERY ?? "support escalation customer blocker" },
+      { source: "Revenue" as const, impactArea: "Revenue" as const, query: process.env.NOTION_REVENUE_QUERY ?? "revenue renewal churn payment blocker" },
+      { source: "Calendar" as const, impactArea: "Operations" as const, query: process.env.NOTION_CALENDAR_QUERY ?? "launch deadline review schedule blocker" },
+      { source: "Docs" as const, impactArea: "Engineering" as const, query: process.env.NOTION_DOCS_QUERY ?? "runbook launch brief documentation gap" },
+    ];
+
+    const results = await Promise.all(
+      queries.map(async (definition) => {
+        const output = await callTool(client, searchTool, { query: definition.query });
+
+        return createNotionSearchSignal({
+          source: definition.source,
+          impactArea: definition.impactArea,
+          query: definition.query,
+          text: output.text,
+        });
+      })
+    );
+
+    return results.filter((item): item is Signal => Boolean(item));
+  } catch {
+    return [];
+  }
 }
 
 const buildDecisionMarkdown = (signal: Signal, exceptionRecord: ExceptionRecord, decision: DecisionBrief) => `# ${decision.headline}

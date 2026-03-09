@@ -12,7 +12,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "exceptionId is required." }, { status: 400 });
     }
 
-    const payload = getDecisionPayload(body.exceptionId);
+    const payload = await getDecisionPayload(body.exceptionId);
 
     if (!payload) {
       return NextResponse.json({ error: "The selected exception could not be resolved." }, { status: 404 });

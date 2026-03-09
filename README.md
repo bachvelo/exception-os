@@ -1,6 +1,6 @@
 # Exception OS
 
-Exception OS is a deployed SaaS-style operating system for teams that need fewer dashboards and faster decisions. It ingests operational signals, detects exceptions that require human judgment, generates structured decision briefs, and routes them into a Notion-centered workflow.
+Exception OS is a deployed SaaS-style operating system for teams that need fewer dashboards and faster decisions. It ingests live operational signals, detects exceptions that require human judgment, generates structured decision briefs, and routes them into a Notion-centered workflow.
 
 [Live Demo](https://exception-os.vercel.app) · [GitHub Repository](https://github.com/aniruddhaadak80/exception-os) · [DEV Submission Draft](./docs/devto-submission.md)
 
@@ -13,6 +13,7 @@ Exception OS is complete as a deployable challenge app and SaaS-style product fo
 - Lint, tests, and production build are passing.
 - Real Notion MCP OAuth, workspace sync, and Notion publishing are implemented server-side.
 - Other users can use the deployed app by connecting their own Notion workspace.
+- Live GitHub activity now feeds the dashboard without seeded incident templates.
 
 The only runtime step that still depends on the user is approving Notion OAuth for a specific workspace, which cannot be done automatically on someone else’s behalf.
 
@@ -22,14 +23,10 @@ The only runtime step that still depends on the user is approving Notion OAuth f
 - Per-user Notion OAuth connection flow
 - Live Notion MCP workspace search
 - Live publishing of decision briefs into the connected workspace
+- Live GitHub repository ingestion for engineering, workflow, milestone, and documentation activity
 - Production build, linting, tests, screenshots, and challenge documentation
 
-## What Is In Demo Mode
-
-- Upstream operational signal ingestion currently uses deterministic challenge data instead of live SaaS connectors
-- Exception generation is based on a seeded in-app signal engine rather than persisted external event streams
-
-This means the app is not a fake mockup. It is a real deployed product with a real Notion integration, while the upstream source feeds are intentionally demo-mode for reliability during judging.
+This means the app is not a fake mockup. It is a real deployed product with a real Notion integration and a live GitHub-backed ingestion layer.
 
 ## Screenshots
 
@@ -44,7 +41,7 @@ This means the app is not a fake mockup. It is a real deployed product with a re
 This repository contains:
 
 - A polished Next.js production deployment for the Exception OS dashboard
-- A local simulation engine for signals, exceptions, and decisions
+- A live-source engine for GitHub activity and connected Notion workspace context
 - A real server-side Notion MCP integration for OAuth, workspace search, and publishing
 - Product documentation for the feature spec and architecture
 - A challenge-ready narrative aligned with the Notion MCP judging criteria
@@ -64,7 +61,7 @@ Then open `http://localhost:3000`.
 
 ## Notion MCP integration
 
-This app now includes a real server-side Notion MCP adapter with OAuth, token refresh support, workspace search, and page publishing.
+This app now includes a real server-side Notion MCP adapter with OAuth, token refresh support, workspace search, and page publishing, plus live GitHub ingestion for repository-driven operational signals.
 
 To enable it locally or on Vercel, configure:
 
@@ -74,14 +71,17 @@ Optional:
 
 - `NOTION_MCP_SERVER_URL`: defaults to `https://mcp.notion.com`
 - `NOTION_PARENT_PAGE_ID` or `NOTION_PARENT_DATABASE_ID`: custom Notion location for published decision briefs. If omitted, Exception OS publishes to the workspace root when supported by the connected workspace.
+- `EXCEPTION_OS_GITHUB_REPO`: GitHub repository to ingest live signals from, in `owner/repo` format
+- `EXCEPTION_OS_GITHUB_TOKEN`: optional GitHub token for higher rate limits
+- `NOTION_SUPPORT_QUERY`, `NOTION_REVENUE_QUERY`, `NOTION_CALENDAR_QUERY`, `NOTION_DOCS_QUERY`: optional workspace-specific search prompts for live Notion signal ingestion
 
 Once configured, use the dashboard's `Connect Notion MCP` action to complete OAuth.
 
 ## Demo flow
 
 1. View the live operations board.
-2. Review the active exception queue.
-3. Trigger a new simulated incident from the dashboard.
+2. Review the active exception queue sourced from GitHub and Notion.
+3. Refresh the dashboard to pull the latest live signals.
 4. Connect Notion MCP and publish the selected decision brief into your workspace.
 5. Sync related workspace context back into the dashboard.
 
@@ -98,7 +98,7 @@ The prepared DEV submission is in [./docs/devto-submission.md](./docs/devto-subm
 
 ## Current implementation scope
 
-This version runs as a polished challenge app out of the box and already includes a real Notion-connected workflow. External signal feeds are still demo-mode, but Notion read and write operations are live once connected, and the deployed app is usable by other users with their own Notion workspace.
+This version runs as a polished challenge app out of the box and already includes a real Notion-connected workflow plus live GitHub ingestion. Notion read and write operations are live once connected, and the deployed app is usable by other users with their own Notion workspace.
 
 ## Judge-Facing Summary
 
@@ -106,8 +106,8 @@ If you are using this README to understand challenge readiness, the most accurat
 
 - The app is fully deployed and usable.
 - The Notion MCP integration is real and central to the product.
-- The upstream signal layer is intentionally demo-mode to keep the judging flow reliable.
-- The architecture is already structured for live source connectors as the next production increment.
+- The upstream signal layer is live for GitHub and live for connected Notion workspace search.
+- The architecture is already structured for adding more source connectors as the next production increment.
 
 ## Quality checks
 

@@ -1,33 +1,6 @@
-import {
-  DashboardSnapshot,
-  DecisionBrief,
-  ExceptionRecord,
-  ImpactArea,
-  Priority,
-  Signal,
-  SignalSource,
-  Severity,
-} from "@/lib/types";
-
-type SimulationTemplate = {
-  source: SignalSource;
-  severity: Severity;
-  impactArea: ImpactArea;
-  title: string;
-  summary: string;
-  affectedEntity: string;
-  owner: string;
-  reason: string;
-  likelyCause: string;
-  actions: string[];
-  evidence: string[];
-};
-
-type StoreState = {
-  signals: Signal[];
-  exceptions: ExceptionRecord[];
-  decisions: DecisionBrief[];
-};
+import { DashboardSnapshot, DecisionBrief, ExceptionRecord, ImpactArea, Priority, Severity, Signal, SignalSource } from "@/lib/types";
+import { fetchGitHubSignals } from "@/lib/live-sources";
+import { fetchNotionSignals } from "@/lib/notion/adapter";
 
 const ownersByImpact: Record<ImpactArea, string> = {
   Engineering: "Platform Lead",
@@ -36,113 +9,49 @@ const ownersByImpact: Record<ImpactArea, string> = {
   Operations: "Chief of Staff",
 };
 
-const templates: SimulationTemplate[] = [
-  {
-    source: "GitHub",
-    severity: "Critical",
-    impactArea: "Engineering",
-    title: "Deployment failed on checkout pipeline",
-    summary: "The production checkout deployment failed twice after merge and the rollback did not restore webhook processing.",
-    affectedEntity: "Checkout service",
-    owner: "Platform Lead",
-    reason: "Critical engineering incident blocking production revenue flow.",
-    likelyCause: "A schema mismatch between the checkout worker and webhook consumer is likely breaking the release path.",
-    actions: [
-      "Freeze further deploys to checkout services for 45 minutes.",
-      "Assign platform lead to restore webhook processing via last known good migration set.",
-      "Create a customer-impact note for revenue and support teams."
-    ],
-    evidence: [
-      "Two failed deployments within 14 minutes.",
-      "Webhook retries increased 340 percent after release.",
-      "Revenue sync jobs are now delayed beyond SLA."
-    ]
-  },
-  {
-    source: "Support",
-    severity: "High",
-    impactArea: "Customer",
-    title: "Enterprise customer escalation is waiting without owner",
-    summary: "A tier-one customer reported blocked onboarding and no response owner has been assigned in the last 90 minutes.",
-    affectedEntity: "Northstar Health",
-    owner: "Support Director",
-    reason: "High-value customer escalation with undefined ownership.",
-    likelyCause: "Routing rules likely failed because the issue spans support, product, and onboarding operations.",
-    actions: [
-      "Assign an incident owner and customer communicator immediately.",
-      "Open an internal resolution thread with product and onboarding.",
-      "Promise next update to the customer within 30 minutes."
-    ],
-    evidence: [
-      "Account ARR tier is marked strategic.",
-      "No owner present on the escalation record.",
-      "Customer has sent three follow-ups in under one hour."
-    ]
-  },
-  {
-    source: "Revenue",
-    severity: "High",
-    impactArea: "Revenue",
-    title: "Renewal conversion dropped below weekly threshold",
-    summary: "Weekly renewal conversion is down 18 percent and no corresponding pricing or campaign change has been logged.",
-    affectedEntity: "Renewal pipeline",
-    owner: "Revenue Ops",
-    reason: "Unexplained revenue anomaly without a linked change record.",
-    likelyCause: "Payment retry logic or CRM handoff gaps may be reducing conversions before account management can intervene.",
-    actions: [
-      "Compare failed payment retries against prior week baseline.",
-      "Audit CRM ownership gaps for renewals closing this week.",
-      "Draft recovery outreach for at-risk accounts."
-    ],
-    evidence: [
-      "Renewal rate moved from 71 percent to 53 percent week over week.",
-      "No approved pricing experiment exists in planning notes.",
-      "Failure concentration is highest in accounts without named owner."
-    ]
-  },
-  {
-    source: "Calendar",
-    severity: "Medium",
-    impactArea: "Operations",
-    title: "Launch review conflict detected across leadership",
-    summary: "The launch readiness review overlaps with two dependency meetings for leadership and the release checklist still has unresolved items.",
-    affectedEntity: "April launch",
-    owner: "Chief of Staff",
-    reason: "Launch governance conflict with unresolved readiness blockers.",
-    likelyCause: "Calendar planning and release checklist workflows are disconnected.",
-    actions: [
-      "Reschedule the readiness review with all required approvers.",
-      "Escalate unresolved checklist items into a launch blocker list.",
-      "Publish a final owner matrix before end of day."
-    ],
-    evidence: [
-      "Two mandatory approvers are double-booked.",
-      "Three launch checklist items remain unowned.",
-      "Marketing timeline depends on approval outcome."
-    ]
-  },
-  {
-    source: "Docs",
-    severity: "Medium",
-    impactArea: "Engineering",
-    title: "Merged feature has no launch document",
-    summary: "A user-facing feature was merged to main but no rollout doc, support brief, or analytics plan exists.",
-    affectedEntity: "Workflow automations",
-    owner: "Platform Lead",
-    reason: "Release readiness gap between engineering and operational docs.",
-    likelyCause: "Definition of done does not enforce operational documentation requirements.",
-    actions: [
-      "Open a launch brief before feature release.",
-      "Assign support and analytics signoff.",
-      "Add a documentation gate to the release process."
-    ],
-    evidence: [
-      "Feature branch merged within last 6 hours.",
-      "No linked launch note in project workspace.",
-      "Support team has not received a change summary."
-    ]
-  }
-];
+const reasonBySource: Record<SignalSource, string> = {
+  GitHub: "Engineering activity requires review before it turns into a delivery risk.",
+  Support: "A live customer-facing signal indicates a support escalation that needs ownership.",
+  Revenue: "A live revenue-related signal indicates commercial risk or unexplained movement.",
+  Calendar: "A live schedule signal indicates coordination or deadline risk.",
+  Docs: "A live documentation or launch-readiness signal indicates an operational gap.",
+};
+
+const causeBySource: Record<SignalSource, string> = {
+  GitHub: "The repository activity suggests an engineering workflow problem, unresolved issue, or failing release path.",
+  Support: "Customer context in the connected workspace suggests unresolved ownership or blocked resolution flow.",
+  Revenue: "Revenue-related context suggests churn, payment, renewal, or ownership friction that needs intervention.",
+  Calendar: "Calendar or milestone context suggests the schedule is misaligned with the required approvals or deliverables.",
+  Docs: "Documentation context suggests the operational record is lagging behind product or launch activity.",
+};
+
+const actionBySource: Record<SignalSource, string[]> = {
+  GitHub: [
+    "Review the underlying repository activity and identify the blocking change or workflow failure.",
+    "Assign an engineering owner and capture the next checkpoint in Notion.",
+    "Publish a decision brief so the team has a single source of operational truth."
+  ],
+  Support: [
+    "Assign a single incident owner for the customer-facing issue.",
+    "Capture the current blocker and next update time in Notion.",
+    "Coordinate product and support response before the issue escalates further."
+  ],
+  Revenue: [
+    "Review the affected accounts or pipeline segment immediately.",
+    "Document the working theory and owner in Notion.",
+    "Prepare a mitigation or outreach plan before the next reporting window."
+  ],
+  Calendar: [
+    "Confirm owner availability and milestone dependencies.",
+    "Resolve date conflicts or missing approvals.",
+    "Capture the revised plan in Notion so all stakeholders have one operating record."
+  ],
+  Docs: [
+    "Review the missing or recently changed documentation artifact.",
+    "Assign an owner for the operational record and rollout note.",
+    "Publish the decision brief to Notion so documentation and execution stay aligned."
+  ],
+};
 
 const scoreBySeverity: Record<Severity, number> = {
   Low: 20,
@@ -163,113 +72,72 @@ const priorityFromSeverity = (severity: Severity): Priority => {
   return "Watch";
 };
 
-const createId = (prefix: string) => `${prefix}-${Math.random().toString(36).slice(2, 8)}`;
-
-const toSignal = (template: SimulationTemplate): Signal => ({
-  id: createId("sig"),
-  source: template.source,
-  title: template.title,
-  summary: template.summary,
-  severity: template.severity,
-  impactArea: template.impactArea,
-  affectedEntity: template.affectedEntity,
-  receivedAt: new Date().toISOString(),
-});
-
-const toException = (signal: Signal, template: SimulationTemplate): ExceptionRecord => ({
-  id: createId("exc"),
+const toException = (signal: Signal): ExceptionRecord => ({
+  id: `exc-${signal.id}`,
   signalId: signal.id,
   priority: priorityFromSeverity(signal.severity),
   status: signal.severity === "Critical" ? "Investigating" : "Ready for Approval",
-  confidence: Math.min(99, scoreBySeverity[signal.severity] + (signal.source === "Revenue" ? 4 : 0)),
-  reason: template.reason,
-  owner: template.owner || ownersByImpact[signal.impactArea],
+  confidence: scoreBySeverity[signal.severity],
+  reason: reasonBySource[signal.source],
+  owner: ownersByImpact[signal.impactArea],
   slaMinutes: signal.severity === "Critical" ? 15 : signal.severity === "High" ? 30 : 90,
 });
 
-const toDecision = (exceptionRecord: ExceptionRecord, template: SimulationTemplate): DecisionBrief => ({
-  id: createId("dec"),
+const toDecision = (signal: Signal, exceptionRecord: ExceptionRecord): DecisionBrief => ({
+  id: `dec-${signal.id}`,
   exceptionId: exceptionRecord.id,
-  headline: `${template.impactArea} exception: ${template.title}`,
-  whyNow: template.reason,
-  likelyCause: template.likelyCause,
-  recommendedActions: template.actions,
-  evidence: template.evidence,
+  headline: `${signal.impactArea} exception: ${signal.title}`,
+  whyNow: reasonBySource[signal.source],
+  likelyCause: causeBySource[signal.source],
+  recommendedActions: actionBySource[signal.source],
+  evidence: [
+    signal.summary,
+    `Affected entity: ${signal.affectedEntity}`,
+    `Observed at: ${new Date(signal.receivedAt).toLocaleString()}`,
+  ],
   suggestedOwner: exceptionRecord.owner,
   outcome: exceptionRecord.status === "Investigating" ? "Needs Revision" : "Drafted",
 });
 
-const buildSeedState = (): StoreState => {
-  const chosenTemplates = templates.slice(0, 3);
-
-  const signals: Signal[] = [];
-  const exceptions: ExceptionRecord[] = [];
-  const decisions: DecisionBrief[] = [];
-
-  for (const template of chosenTemplates) {
-    const signal = toSignal(template);
-    const exceptionRecord = toException(signal, template);
-    const decision = toDecision(exceptionRecord, template);
-
-    signals.push(signal);
-    exceptions.push(exceptionRecord);
-    decisions.push(decision);
-  }
-
-  return { signals, exceptions, decisions };
-};
-
-const globalStore = globalThis as typeof globalThis & {
-  __exceptionOsStore?: StoreState;
-};
-
-const getStore = (): StoreState => {
-  if (!globalStore.__exceptionOsStore) {
-    globalStore.__exceptionOsStore = buildSeedState();
-  }
-
-  return globalStore.__exceptionOsStore;
-};
-
-const computeMetrics = (state: StoreState) => ({
-  exceptionCount: state.exceptions.length,
-  urgentCount: state.exceptions.filter((item) => item.priority === "Urgent").length,
-  approvalRate: 86,
-  averageDecisionMinutes: 17,
+const computeMetrics = (exceptions: ExceptionRecord[]) => ({
+  exceptionCount: exceptions.length,
+  urgentCount: exceptions.filter((item) => item.priority === "Urgent").length,
+  averageConfidence: exceptions.length ? Math.round(exceptions.reduce((sum, item) => sum + item.confidence, 0) / exceptions.length) : 0,
+  averageSlaMinutes: exceptions.length ? Math.round(exceptions.reduce((sum, item) => sum + item.slaMinutes, 0) / exceptions.length) : 0,
 });
 
-export const getDashboardSnapshot = (): DashboardSnapshot => {
-  const state = getStore();
+const buildSourceSummary = (signals: Signal[]) => {
+  const sources = Array.from(new Set(signals.map((signal) => signal.source)));
+
+  if (sources.length === 0) {
+    return "No live signal sources responded.";
+  }
+
+  return `Live signals from ${sources.join(", ")}.`;
+};
+
+export const getDashboardSnapshot = async (): Promise<DashboardSnapshot> => {
+  const [githubSignals, notionSignals] = await Promise.all([fetchGitHubSignals(), fetchNotionSignals()]);
+  const signals = [...githubSignals, ...notionSignals]
+    .sort((left, right) => right.receivedAt.localeCompare(left.receivedAt))
+    .slice(0, 8);
+  const exceptions = signals.map((signal) => toException(signal));
+  const decisions = signals.map((signal, index) => toDecision(signal, exceptions[index]));
 
   return {
     generatedAt: new Date().toISOString(),
-    metrics: computeMetrics(state),
-    signals: [...state.signals].sort((a, b) => b.receivedAt.localeCompare(a.receivedAt)),
-    exceptions: [...state.exceptions],
-    decisions: [...state.decisions],
+    metrics: computeMetrics(exceptions),
+    signals,
+    exceptions,
+    decisions,
+    sourceSummary: buildSourceSummary(signals),
   };
 };
 
-export const simulateSignal = (): DashboardSnapshot => {
-  const state = getStore();
-  const template = templates[Math.floor(Math.random() * templates.length)];
-  const signal = toSignal(template);
-  const exceptionRecord = toException(signal, template);
-  const decision = toDecision(exceptionRecord, template);
+export const simulateSignal = async (): Promise<DashboardSnapshot> => getDashboardSnapshot();
 
-  state.signals.unshift(signal);
-  state.exceptions.unshift(exceptionRecord);
-  state.decisions.unshift(decision);
-
-  state.signals = state.signals.slice(0, 8);
-  state.exceptions = state.exceptions.slice(0, 6);
-  state.decisions = state.decisions.slice(0, 6);
-
-  return getDashboardSnapshot();
-};
-
-export const getDecisionPayload = (exceptionId: string) => {
-  const snapshot = getDashboardSnapshot();
+export const getDecisionPayload = async (exceptionId: string) => {
+  const snapshot = await getDashboardSnapshot();
   const exceptionRecord = snapshot.exceptions.find((item) => item.id === exceptionId);
 
   if (!exceptionRecord) {

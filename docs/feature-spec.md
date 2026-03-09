@@ -4,7 +4,7 @@
 
 Exception OS is an AI-powered operational command center that watches incoming signals across a business, detects moments that require human judgment, and converts them into structured decision briefs. Its core promise is simple: do not summarize everything, escalate only what matters.
 
-For the challenge build, the product is delivered as a deployed SaaS-style web application with real per-user Notion workspace connectivity and a demo-mode upstream signal engine.
+For the challenge build, the product is delivered as a deployed SaaS-style web application with real per-user Notion workspace connectivity and live upstream signals from GitHub plus connected Notion workspace context.
 
 ## Challenge Positioning
 
@@ -99,8 +99,9 @@ Human edits to recommendations become learning signals that improve future routi
 - Signal feed with severity and source metadata
 - Decision brief viewer
 - Recommended next actions
-- Simulation endpoint to generate realistic incoming incidents
-- Metrics cards for exception volume, approval rate, and resolution velocity
+- Live GitHub ingestion for repository activity
+- Live Notion workspace search used as an operational signal source
+- Metrics cards for exception volume, average confidence, and average SLA pressure
 - Per-user Notion OAuth connection
 - Live Notion workspace sync through MCP
 - Live publishing of decision briefs to Notion
@@ -109,7 +110,7 @@ Human edits to recommendations become learning signals that improve future routi
 
 - First-party app accounts beyond per-user Notion OAuth sessions
 - Shared team collaboration model outside the connected Notion workspace
-- Live integrations with external SaaS APIs for upstream signal ingestion
+- Additional live integrations beyond GitHub and Notion-based signal ingestion
 - True LLM inference pipeline
 - Background workers and persistent database
 
@@ -139,7 +140,8 @@ Notion stores and governs:
 - Decision brief quality rated as useful by a human reviewer
 - Dashboard can simulate multiple exception types without code changes
 - Live Notion publishing works for any connected user workspace
-- Architecture clearly shows production path to live source connectors
+- Live GitHub ingestion works without seeded demo incidents
+- Architecture clearly shows production path to broader source connectors
 
 ## Winning Demo Narrative
 

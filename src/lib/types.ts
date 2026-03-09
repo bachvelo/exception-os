@@ -45,8 +45,8 @@ export type DecisionBrief = {
 export type DashboardMetrics = {
   exceptionCount: number;
   urgentCount: number;
-  approvalRate: number;
-  averageDecisionMinutes: number;
+  averageConfidence: number;
+  averageSlaMinutes: number;
 };
 
 export type DashboardSnapshot = {
@@ -55,6 +55,7 @@ export type DashboardSnapshot = {
   signals: Signal[];
   exceptions: ExceptionRecord[];
   decisions: DecisionBrief[];
+  sourceSummary: string;
 };
 
 export type NotionStatus = {

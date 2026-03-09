@@ -2,7 +2,7 @@
 
 ## System Overview
 
-Exception OS is structured as a presentation layer, orchestration layer, decision engine, and memory layer. The current implementation ships as a deployed SaaS-style web application. Its live collaboration boundary is the user-owned Notion workspace, while upstream signal ingestion remains in deterministic demo mode.
+Exception OS is structured as a presentation layer, orchestration layer, decision engine, and memory layer. The current implementation ships as a deployed SaaS-style web application. Its live collaboration boundary is the user-owned Notion workspace, and its upstream signal ingestion currently combines live GitHub data with live Notion workspace search context.
 
 ## Architectural Principles
 
@@ -34,7 +34,7 @@ Responsibilities:
 Endpoints:
 
 - `GET /api/dashboard`: returns the current dashboard snapshot
-- `POST /api/simulate`: injects a new signal and recalculates exceptions
+- `POST /api/simulate`: refreshes the live dashboard snapshot on demand
 - `GET /api/notion/status`: returns Notion connection state for the current user session
 - `GET /api/notion/connect`: starts the Notion OAuth flow
 - `GET /api/notion/callback`: completes the Notion OAuth flow
@@ -49,13 +49,13 @@ Responsibilities:
 
 ### 3. Simulation Store
 
-Current state handling uses an in-memory singleton module.
+Current state handling no longer depends on a seeded incident store. The dashboard snapshot is built from live source adapters on each request.
 
 Responsibilities:
 
-- Hold signals, exceptions, and decisions
-- Seed the app with realistic starting data
-- Generate new signals for demos
+- Fetch live GitHub signals from the configured repository
+- Fetch live operational context from the connected Notion workspace
+- Normalize raw source data into dashboard signals
 
 Production replacement:
 
@@ -98,6 +98,7 @@ Current implementation status:
 - Publishes decision briefs into a configured Notion parent page or database, or workspace root fallback
 - Searches connected workspace context through live MCP tool calls
 - Works on a per-user basis so different users can connect different Notion workspaces
+- Contributes live workspace-derived signals to the dashboard
 
 ### 6. Human Review Loop
 
@@ -156,13 +157,13 @@ Workflow:
 3. API returns current signals, exceptions, decision briefs, and metrics.
 4. UI renders the command center.
 
-### Incident simulation
+### Live signal refresh
 
-1. User clicks simulate.
+1. User clicks refresh.
 2. Browser sends `POST /api/simulate`.
-3. Simulation store creates a realistic signal.
-4. Decision engine scores the new signal.
-5. If the signal crosses threshold, a new exception and decision brief are created.
+3. The server fetches live GitHub repository signals.
+4. If Notion is connected, the server fetches live workspace search signals.
+5. The decision engine scores the resulting signals.
 6. API returns the updated snapshot.
 
 ### Notion connection and publishing
@@ -178,8 +179,8 @@ Workflow:
 
 To convert this MVP into a challenge-grade integrated system:
 
-1. Replace the in-memory incident generator with persistent event storage.
-2. Add real source connectors for GitHub, Stripe, support, or calendar.
+1. Add persistent storage for historical snapshots and decisions.
+2. Add more live source connectors for Stripe, support platforms, or calendars.
 3. Map published decision pages into a dedicated Notion data source schema.
 4. Add a background queue for classification jobs.
 5. Add first-party app accounts and a shared team data model.
@@ -197,8 +198,8 @@ To convert this MVP into a challenge-grade integrated system:
 - Risk: generic dashboards feel ordinary.
   Mitigation: center the product on exception-driven decisions, not metrics alone.
 
-- Risk: no live integrations may reduce perceived complexity.
-  Mitigation: provide realistic simulation data, keep the Notion workflow live, and document the live-vs-demo boundary clearly.
+- Risk: limited source coverage compared to a full enterprise operations stack.
+  Mitigation: ship real GitHub and Notion ingestion now, and keep the connector layer ready for additional systems.
 
 - Risk: judging may favor polished demos.
   Mitigation: ship a visually strong command center with an obvious human-in-the-loop workflow.

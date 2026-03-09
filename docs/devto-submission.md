@@ -1,5 +1,5 @@
 ---
-title: Exception OS - a deployed AI operating system with real Notion MCP workflows
+title: Exception OS - a deployed AI operating system with live Notion MCP and GitHub workflows
 published: false
 tags: devchallenge, notionchallenge, mcp, ai
 ---
@@ -21,30 +21,26 @@ This challenge build is already deployed as a public web app. Other users can op
 The application includes:
 
 - A live operations dashboard for signals, exceptions, and decision briefs
+- Live GitHub ingestion for repository activity, workflow state, milestones, and documentation changes
 - A real Notion MCP integration using OAuth, PKCE, token refresh, and server-side MCP tool calls
 - Publishing of decision briefs directly into Notion pages or databases
 - Workspace sync that pulls context back from Notion search
-- A polished challenge build with deterministic incident ingestion for GitHub, support, revenue, calendar, and documentation failures
+- A polished challenge build that combines GitHub activity with connected Notion workspace context
 
 In short, Exception OS treats Notion as the operational memory and approval layer for critical decisions.
 
-## What Is Real vs Demo Mode
+## What Is Real Today
 
-The important distinction in this project is that the **Notion workflow is fully real**, while the **upstream signal ingestion is currently demo-mode**.
-
-### Real today
+Everything in the core workflow is now live:
 
 - public deployment on Vercel
 - per-user Notion workspace connection via OAuth
 - secure server-side MCP client with token refresh
 - live Notion search
 - live publishing of decision briefs into Notion
+- live GitHub repository ingestion for upstream operational signals
 
-### Demo mode today
-
-- source signals are seeded and simulated rather than pulled from live SaaS connectors
-
-I chose that boundary intentionally so the judging flow stays reliable while the central Notion MCP workflow remains real and testable.
+The current limitation is not simulation. The limitation is **connector breadth**: GitHub and Notion are live today, while other systems like Stripe or dedicated support tools are still future connectors.
 
 ## Screenshots
 
@@ -106,7 +102,7 @@ The app is built with:
 - React 19
 - Server-side Notion MCP client using `@modelcontextprotocol/sdk`
 - Secure encrypted cookies for session state
-- Deterministic signal engine for challenge-friendly incident ingestion
+- Live GitHub signal engine plus connected Notion workspace ingestion
 
 The architecture intentionally separates:
 
@@ -115,7 +111,7 @@ The architecture intentionally separates:
 - Notion publishing
 - workspace context sync
 
-That keeps the live Notion workflow real today while making the path to fully live source ingestion obvious.
+That gives the product a real end-to-end loop today while keeping the path to broader connector coverage obvious.
 
 ## Challenges I Ran Into
 
@@ -132,13 +128,13 @@ That required:
 
 That extra work was worth it because it turned the project from a mock into a real integration.
 
-The second challenge was deciding where to keep the build honest. I did not want to pretend that simulated source feeds were the same as live source connectors. So I kept the demo signal layer explicit and focused the real implementation effort on the Notion MCP workflow, which is the core of the challenge.
+The second challenge was turning the upstream feed into something real without depending on private customer infrastructure. I solved that by using live GitHub activity as a public operational signal source and live Notion workspace context as the operator memory layer.
 
 ## What’s Next
 
 The current version focuses on the decision layer and Notion MCP integration. The next steps are:
 
-- replace simulated signals with live GitHub, support, and revenue connectors
+- add more live connectors for support, revenue, and calendar systems beyond GitHub and Notion
 - store exceptions in a dedicated Notion data source schema
 - add approval analytics and learning from human edits
 - add first-party app accounts and shared team workspaces
