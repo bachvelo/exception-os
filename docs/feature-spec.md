@@ -4,6 +4,8 @@
 
 Exception OS is an AI-powered operational command center that watches incoming signals across a business, detects moments that require human judgment, and converts them into structured decision briefs. Its core promise is simple: do not summarize everything, escalate only what matters.
 
+For the challenge build, the product is delivered as a deployed SaaS-style web application with real per-user Notion workspace connectivity and a demo-mode upstream signal engine.
+
 ## Challenge Positioning
 
 This concept is designed to score well on:
@@ -99,18 +101,21 @@ Human edits to recommendations become learning signals that improve future routi
 - Recommended next actions
 - Simulation endpoint to generate realistic incoming incidents
 - Metrics cards for exception volume, approval rate, and resolution velocity
+- Per-user Notion OAuth connection
+- Live Notion workspace sync through MCP
+- Live publishing of decision briefs to Notion
 
 ## Out-of-Scope for MVP
 
-- Real authentication
-- Multi-user collaboration
-- Live integrations with external SaaS APIs
+- First-party app accounts beyond per-user Notion OAuth sessions
+- Shared team collaboration model outside the connected Notion workspace
+- Live integrations with external SaaS APIs for upstream signal ingestion
 - True LLM inference pipeline
 - Background workers and persistent database
 
 ## Notion MCP Role
 
-In the production version, Notion MCP is a core system boundary, not a cosmetic integration.
+In the current shipped version, Notion MCP is a core runtime dependency, not a cosmetic integration.
 
 Notion stores and governs:
 
@@ -133,7 +138,8 @@ Notion stores and governs:
 - Time from signal to exception draft under 30 seconds in demo mode
 - Decision brief quality rated as useful by a human reviewer
 - Dashboard can simulate multiple exception types without code changes
-- Architecture clearly shows production path to Notion MCP
+- Live Notion publishing works for any connected user workspace
+- Architecture clearly shows production path to live source connectors
 
 ## Winning Demo Narrative
 

@@ -199,7 +199,7 @@ export function ExceptionOsApp() {
       <section className="panel notion-panel">
         <PanelHeader
           title="Notion MCP"
-          subtitle="Live workspace search and publishing now run through a real server-side Notion MCP client with OAuth and token refresh support."
+          subtitle="Each user can connect their own Notion workspace. Search and publishing run through a real server-side Notion MCP client with OAuth and token refresh support."
         />
         <div className="notion-row">
           <div className="notion-status-card">
@@ -239,6 +239,31 @@ export function ExceptionOsApp() {
             {notionStatus?.error ? <div className="feedback-card feedback-error">{notionStatus.error}</div> : null}
           </div>
         )}
+      </section>
+
+      <section className="mode-grid">
+        <article className="panel mode-card">
+          <PanelHeader
+            title="Workspace Mode"
+            subtitle="The deployed app is usable by other users because each browser session can connect its own Notion workspace through OAuth."
+          />
+          <ul className="architecture-list compact-list">
+            <li>Per-user Notion OAuth session stored in secure HTTP-only cookies</li>
+            <li>Live Notion workspace search through MCP</li>
+            <li>Live publishing of decision briefs into the connected workspace</li>
+          </ul>
+        </article>
+        <article className="panel mode-card">
+          <PanelHeader
+            title="Ingestion Mode"
+            subtitle="Operational signals currently run in deterministic demo mode so the product can be judged reliably without depending on external APIs during the challenge."
+          />
+          <ul className="architecture-list compact-list">
+            <li>Signals are simulated but structured like real GitHub, support, revenue, calendar, and docs events</li>
+            <li>Decision generation, exception routing, and Notion publishing are fully functional</li>
+            <li>The architecture keeps live source connectors as the next production step</li>
+          </ul>
+        </article>
       </section>
 
       <section className="metrics-grid">
@@ -319,9 +344,10 @@ export function ExceptionOsApp() {
         </div>
 
         <div className="panel architecture-panel">
-          <PanelHeader title="Architecture at a glance" subtitle="The demo runs locally, but the boundaries mirror a production Notion MCP system." />
+          <PanelHeader title="Architecture at a glance" subtitle="This is a deployed SaaS-style app with real user-owned Notion workspaces and demo-mode upstream signals." />
           <ul className="architecture-list">
-            <li>Signal connectors ingest GitHub, support, revenue, calendar, and docs events.</li>
+            <li>Each user can connect a separate Notion workspace through OAuth.</li>
+            <li>Signal ingestion currently uses challenge-stable demo events shaped like GitHub, support, revenue, calendar, and docs signals.</li>
             <li>A hybrid decision engine scores severity, business impact, and owner ambiguity.</li>
             <li>Decision briefs are published into Notion through a real MCP client and OAuth flow.</li>
             <li>Human approval closes the loop and feeds future routing quality.</li>

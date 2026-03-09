@@ -2,7 +2,7 @@
 
 ## System Overview
 
-Exception OS is structured as a presentation layer, orchestration layer, decision engine, and memory layer. The current implementation ships as a local demo, but the architecture already separates the components required for a production-grade Notion MCP workflow.
+Exception OS is structured as a presentation layer, orchestration layer, decision engine, and memory layer. The current implementation ships as a deployed SaaS-style web application. Its live collaboration boundary is the user-owned Notion workspace, while upstream signal ingestion remains in deterministic demo mode.
 
 ## Architectural Principles
 
@@ -27,6 +27,7 @@ Responsibilities:
 - Show signals and active exceptions
 - Render decision brief details
 - Trigger incident simulation
+- Handle per-user Notion connection and publishing actions
 
 ### 2. API Layer
 
@@ -34,6 +35,11 @@ Endpoints:
 
 - `GET /api/dashboard`: returns the current dashboard snapshot
 - `POST /api/simulate`: injects a new signal and recalculates exceptions
+- `GET /api/notion/status`: returns Notion connection state for the current user session
+- `GET /api/notion/connect`: starts the Notion OAuth flow
+- `GET /api/notion/callback`: completes the Notion OAuth flow
+- `POST /api/notion/sync`: searches the connected Notion workspace
+- `POST /api/notion/publish`: publishes a decision brief into Notion
 
 Responsibilities:
 
@@ -55,6 +61,7 @@ Production replacement:
 
 - Postgres or Supabase for event storage
 - Queue and worker for async classification
+- Webhook or polling connectors for live source ingestion
 
 ### 4. Decision Engine
 
@@ -88,8 +95,9 @@ Current implementation status:
 - Implemented as a real server-side MCP client
 - Uses OAuth 2.0 with PKCE and dynamic client registration
 - Stores encrypted session state in HTTP-only cookies
-- Publishes decision briefs into a configured Notion parent page or database
+- Publishes decision briefs into a configured Notion parent page or database, or workspace root fallback
 - Searches connected workspace context through live MCP tool calls
+- Works on a per-user basis so different users can connect different Notion workspaces
 
 ### 6. Human Review Loop
 
@@ -157,6 +165,15 @@ Workflow:
 5. If the signal crosses threshold, a new exception and decision brief are created.
 6. API returns the updated snapshot.
 
+### Notion connection and publishing
+
+1. User opens the deployed app.
+2. User starts Notion OAuth.
+3. The server completes discovery, PKCE, and token exchange.
+4. Session tokens are stored in secure HTTP-only cookies.
+5. The user can search their Notion workspace or publish a decision brief.
+6. MCP tool calls execute on the server against the user-owned workspace.
+
 ## Production Architecture Evolution
 
 To convert this MVP into a challenge-grade integrated system:
@@ -165,7 +182,7 @@ To convert this MVP into a challenge-grade integrated system:
 2. Add real source connectors for GitHub, Stripe, support, or calendar.
 3. Map published decision pages into a dedicated Notion data source schema.
 4. Add a background queue for classification jobs.
-5. Add multi-user auth and user-specific workspaces.
+5. Add first-party app accounts and a shared team data model.
 6. Add audit logs and approval analytics.
 
 ## Deployment Plan
@@ -181,7 +198,7 @@ To convert this MVP into a challenge-grade integrated system:
   Mitigation: center the product on exception-driven decisions, not metrics alone.
 
 - Risk: no live integrations may reduce perceived complexity.
-  Mitigation: provide realistic simulation data and a clear architecture path to production Notion MCP.
+  Mitigation: provide realistic simulation data, keep the Notion workflow live, and document the live-vs-demo boundary clearly.
 
 - Risk: judging may favor polished demos.
   Mitigation: ship a visually strong command center with an obvious human-in-the-loop workflow.

@@ -166,7 +166,8 @@ select {
 
 .metrics-grid,
 .content-grid,
-.lower-grid {
+.lower-grid,
+.mode-grid {
   display: grid;
   gap: 18px;
   margin-top: 18px;
@@ -212,6 +213,10 @@ select {
 
 .lower-grid {
   grid-template-columns: 1.1fr 0.9fr;
+}
+
+.mode-grid {
+  grid-template-columns: 1fr 1fr;
 }
 
 .panel {
@@ -504,6 +509,10 @@ select {
   margin-top: 18px;
 }
 
+.compact-list {
+  margin-top: 12px;
+}
+
 .state-panel,
 .empty-detail {
   width: min(720px, calc(100% - 32px));
@@ -516,6 +525,7 @@ select {
   .hero-card,
   .content-grid,
   .lower-grid,
+  .mode-grid,
   .metrics-grid,
   .decision-grid {
     grid-template-columns: 1fr;
